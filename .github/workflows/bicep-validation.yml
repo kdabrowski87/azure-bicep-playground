@@ -42,8 +42,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          shopt -s globstar nullglob
 
-          mapfile -t bicep_files < <(find infra -type f -name '*.bicep' | sort)
+          bicep_files=(infra/**/*.bicep)
 
           if [ ${#bicep_files[@]} -eq 0 ]; then
             echo 'No .bicep files found under infra/.'
@@ -59,8 +60,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          shopt -s globstar nullglob
 
-          mapfile -t bicep_files < <(find infra -type f -name '*.bicep' | sort)
+          bicep_files=(infra/**/*.bicep)
 
           if [ ${#bicep_files[@]} -eq 0 ]; then
             echo 'No .bicep files found under infra/.'
@@ -76,8 +78,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          shopt -s globstar nullglob
 
-          mapfile -t bicepparam_files < <(find infra -type f -name '*.bicepparam' | sort)
+          bicepparam_files=(infra/**/*.bicepparam)
 
           if [ ${#bicepparam_files[@]} -eq 0 ]; then
             echo 'No .bicepparam files found under infra/.'
