@@ -52,7 +52,7 @@ jobs:
 
           for file in "${bicep_files[@]}"; do
             echo "Linting ${file}"
-            bicep lint --file "${file}"
+            bicep lint "${file}"
           done
 
       - name: Validate .bicep files (build)
@@ -69,7 +69,7 @@ jobs:
 
           for file in "${bicep_files[@]}"; do
             echo "Validating ${file}"
-            bicep build --file "${file}" --stdout > /dev/null
+            bicep build "${file}" --stdout > /dev/null
           done
 
       - name: Validate .bicepparam files (build-params)
@@ -86,5 +86,5 @@ jobs:
 
           for file in "${bicepparam_files[@]}"; do
             echo "Validating ${file}"
-            bicep build-params --file "${file}" --stdout > /dev/null
+            bicep build-params "${file}" --stdout > /dev/null
           done
