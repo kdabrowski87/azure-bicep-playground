@@ -38,8 +38,7 @@ var defaultTags = {
 	managedBy: 'bicep'
 }
 
-module keyVault './modules/key-vault.bicep' = {
-	name: 'keyVault-${environment}'
+module keyVault 'br/public:avm/res/key-vault/vault:0.14.0' = {
 	params: {
 		name: keyVaultName
 		location: location
@@ -47,13 +46,24 @@ module keyVault './modules/key-vault.bicep' = {
 		enableRbacAuthorization: true
 		enablePurgeProtection: keyVaultEnablePurgeProtection
 		softDeleteRetentionInDays: keyVaultSoftDeleteRetentionInDays
-		ipRules: keyVaultIpRules
-		virtualNetworkSubnetIds: keyVaultSubnetIds
+		enableVaultForDeployment: false
+		enableVaultForDiskEncryption: false
+		enableVaultForTemplateDeployment: false
+		networkAcls: {
+			bypass: 'AzureServices'
+			defaultAction: 'Deny'
+			ipRules: [for ip in keyVaultIpRules: {
+				value: ip
+			}]
+			virtualNetworkRules: [for subnetId in keyVaultSubnetIds: {
+				id: subnetId
+			}]
+		}
 		publicNetworkAccess: keyVaultPublicNetworkAccess
-		skuName: 'standard'
+		sku: 'standard'
 	}
 }
 
-output keyVaultId string = keyVault.outputs.id
+output keyVaultId string = keyVault.outputs.resourceId
 output keyVaultNameOut string = keyVault.outputs.name
-output keyVaultUri string = keyVault.outputs.vaultUri
+output keyVaultUri string = keyVault.outputs.uri

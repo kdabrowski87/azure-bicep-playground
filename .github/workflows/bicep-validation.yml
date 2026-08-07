@@ -1,0 +1,87 @@
+name: Bicep Validation
+
+on:
+  pull_request:
+    paths:
+      - 'infra/**/*.bicep'
+      - 'infra/**/*.bicepparam'
+      - '.github/workflows/bicep-validation.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'infra/**/*.bicep'
+      - 'infra/**/*.bicepparam'
+      - '.github/workflows/bicep-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint-and-validate:
+    name: Lint and validate Bicep
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bicep CLI
+        uses: azure/setup-bicep@v2
+        with:
+          bicep-version: latest
+
+      - name: Show Bicep version
+        run: bicep --version
+
+      - name: Lint .bicep files
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mapfile -t bicep_files < <(find infra -type f -name '*.bicep' | sort)
+
+          if [ ${#bicep_files[@]} -eq 0 ]; then
+            echo 'No .bicep files found under infra/.'
+            exit 0
+          fi
+
+          for file in "${bicep_files[@]}"; do
+            echo "Linting ${file}"
+            bicep lint --file "${file}"
+          done
+
+      - name: Validate .bicep files (build)
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mapfile -t bicep_files < <(find infra -type f -name '*.bicep' | sort)
+
+          if [ ${#bicep_files[@]} -eq 0 ]; then
+            echo 'No .bicep files found under infra/.'
+            exit 0
+          fi
+
+          for file in "${bicep_files[@]}"; do
+            echo "Validating ${file}"
+            bicep build --file "${file}" --stdout > /dev/null
+          done
+
+      - name: Validate .bicepparam files (build-params)
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mapfile -t bicepparam_files < <(find infra -type f -name '*.bicepparam' | sort)
+
+          if [ ${#bicepparam_files[@]} -eq 0 ]; then
+            echo 'No .bicepparam files found under infra/.'
+            exit 0
+          fi
+
+          for file in "${bicepparam_files[@]}"; do
+            echo "Validating ${file}"
+            bicep build-params --file "${file}" --stdout > /dev/null
+          done

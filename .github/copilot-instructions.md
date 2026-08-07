@@ -17,4 +17,9 @@ Prefer:
 - reusable modules 
 - parameterized deployments
 - secure defaults 
-- content from azure verified modules
+- content from Azure Verified Modules (AVM)
+- AVM-first approach: when a suitable AVM exists, use it instead of custom resource definitions.
+
+If AVM cannot be used:
+- clearly explain why AVM is not suitable in this case (for example: no matching module, missing required feature, version constraint, or policy/compliance limitation).
+- use a custom module in `infra/modules` with secure defaults and clear parameters.
