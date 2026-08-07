@@ -28,9 +28,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Bicep CLI
-        uses: azure/setup-bicep@v2
-        with:
-          bicep-version: latest
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL -o bicep "https://github.com/Azure/bicep/releases/latest/download/bicep-linux-x64"
+          chmod +x bicep
+          sudo mv bicep /usr/local/bin/bicep
 
       - name: Show Bicep version
         run: bicep --version
