@@ -8,6 +8,8 @@ Principles:
 - parameters for dev should go into `infra/parameters/dev.bicepparam` and for prod into `infra/parameters/prod.bicepparam`.
 - modules should go into the `modules` folder and be referenced from the main bicep file.
 - Follow Azure CAF naming conventions
+- GitHub workflows we can add into standard location - `.github/workflows/` 
+
 
 Avoid: 
 - ARM templates, as Bicep is the preferred method for defining Azure resources in this repository.

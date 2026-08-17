@@ -38,56 +38,48 @@ jobs:
       - name: Show Bicep version
         run: bicep --version
 
-      - name: Lint .bicep files
+      - name: Lint and validate files
         shell: bash
         run: |
           set -euo pipefail
           shopt -s globstar nullglob
+
+          run_bicep_mode() {
+            local mode="$1"
+            local empty_message="$2"
+            shift 2
+            local files=("$@")
+
+            if [ ${#files[@]} -eq 0 ]; then
+              echo "${empty_message}"
+              return 0
+            fi
+
+            for file in "${files[@]}"; do
+              case "${mode}" in
+                lint)
+                  echo "Linting ${file}"
+                  bicep lint "${file}"
+                  ;;
+                build)
+                  echo "Validating ${file}"
+                  bicep build "${file}" --stdout
+                  ;;
+                build-params)
+                  echo "Validating ${file}"
+                  bicep build-params "${file}" --stdout
+                  ;;
+                *)
+                  echo "Unsupported mode: ${mode}"
+                  return 1
+                  ;;
+              esac
+            done
+          }
 
           bicep_files=(infra/**/*.bicep)
-
-          if [ ${#bicep_files[@]} -eq 0 ]; then
-            echo 'No .bicep files found under infra/.'
-            exit 0
-          fi
-
-          for file in "${bicep_files[@]}"; do
-            echo "Linting ${file}"
-            bicep lint "${file}"
-          done
-
-      - name: Validate .bicep files (build)
-        shell: bash
-        run: |
-          set -euo pipefail
-          shopt -s globstar nullglob
-
-          bicep_files=(infra/**/*.bicep)
-
-          if [ ${#bicep_files[@]} -eq 0 ]; then
-            echo 'No .bicep files found under infra/.'
-            exit 0
-          fi
-
-          for file in "${bicep_files[@]}"; do
-            echo "Validating ${file}"
-            bicep build "${file}" --stdout
-          done
-
-      - name: Validate .bicepparam files (build-params)
-        shell: bash
-        run: |
-          set -euo pipefail
-          shopt -s globstar nullglob
-
           bicepparam_files=(infra/**/*.bicepparam)
 
-          if [ ${#bicepparam_files[@]} -eq 0 ]; then
-            echo 'No .bicepparam files found under infra/.'
-            exit 0
-          fi
-
-          for file in "${bicepparam_files[@]}"; do
-            echo "Validating ${file}"
-            bicep build-params "${file}" --stdout
-          done
+          run_bicep_mode lint 'No .bicep files found under infra/.' "${bicep_files[@]}"
+          run_bicep_mode build 'No .bicep files found under infra/.' "${bicep_files[@]}"
+          run_bicep_mode build-params 'No .bicepparam files found under infra/.' "${bicepparam_files[@]}"
