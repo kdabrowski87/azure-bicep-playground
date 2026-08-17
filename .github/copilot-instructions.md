@@ -9,7 +9,11 @@ Principles:
 - modules should go into the `modules` folder and be referenced from the main bicep file.
 - Follow Azure CAF naming conventions
 - GitHub workflows we can add into standard location - `.github/workflows/` 
-
+- Follow Cloud Adoption Framework (CAF) best practices for Azure resource deployment and management.
+- Prefer Managed Identities over secrets.
+- Demonstrate Azure Landing Zone concepts when relevant.
+- Demonstrate governance practices when relevant.
+- Examples should be educational and easy to understand.
 
 Avoid: 
 - ARM templates, as Bicep is the preferred method for defining Azure resources in this repository.
